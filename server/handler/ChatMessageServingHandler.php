@@ -66,6 +66,14 @@ class ChatMessageServingHandler
             'user' => $user
         ];
 
+        // 채팅방 닉네임 정보 전달.
+        $nicknames = $chatRoom->getNicknames();
+        foreach ($chatRoom->getClients() as $client) {
+            $client->send(json_encode([
+                'nicknames' => $nicknames
+            ]));
+        }
+
     }
 
     // 채팅방에 메세지 보내기
@@ -82,8 +90,7 @@ class ChatMessageServingHandler
 
         $messageWithRoomInfo = [
             'message' => $message,
-            'from' => $user->nickname,
-            'nicknames' => $chatRoom->getNicknames()
+            'from' => $user->nickname
         ];
 
         // 메세지 보내기.
