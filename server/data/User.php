@@ -1,5 +1,6 @@
 <?php
 
+namespace Server\data;
 class User {
   private string $nickname;
 

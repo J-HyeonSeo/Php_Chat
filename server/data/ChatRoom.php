@@ -1,14 +1,15 @@
 <?php
 
+namespace Server\data;
 class ChatRoom {
   private string $uuid;
   private string $title;
-  private SplObjectStorage $clients;
+  private \SplObjectStorage $clients;
 
   public function __construct(string $uuid, string $title) {
     $this->uuid = $uuid;
     $this->title = $title;
-    $this->clients = new SplObjectStorage;
+    $this->clients = new \SplObjectStorage();
   }
 
   public function getUuid() {

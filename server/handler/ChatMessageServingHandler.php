@@ -1,18 +1,20 @@
 <?php
 
+namespace Server\handler;
+
 use Ratchet\ConnectionInterface;
 
 class ChatMessageServingHandler {
 
-  private SplObjectStorage $clients;
+  private \SplObjectStorage $clients;
   private $chatRoomList;
 
   public function __construct()
   {
-    $this->clients = new SplObjectStorage;
+    $this->clients = new \SplObjectStorage();
   }
 
-  public function onOpen(ConnectionInterface $conn) {
+  public function onOpen(ConnectionInterface $conn, string $uuid) {
     
   }
 

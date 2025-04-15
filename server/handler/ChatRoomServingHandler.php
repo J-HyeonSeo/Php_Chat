@@ -1,14 +1,16 @@
 <?php
 
+namespace Server\handler;
+
 use Ratchet\ConnectionInterface;
 
 class ChatRoomServingHandler {
 
-  private SplObjectStorage $clients;
+  private \SplObjectStorage $clients;
 
   public function __construct()
   {
-    $this->clients = new SplObjectStorage;
+    $this->clients = new \SplObjectStorage();
   }
 
   // 커넥션이 연결되었다면, 채팅방 목록을 제공해주어야 함.
@@ -20,7 +22,7 @@ class ChatRoomServingHandler {
   // 클라이언트에서 채팅방을 신규로 생성하면, 이벤트를 보낼거임. 연결된 clients들에게 변경사항 응답.
   public function onMessage(array $chatRoomList) {
     foreach ($this->clients as $client) {
-      $client->send($chatRoomList);
+      $client->send(json_encode($chatRoomList));
     }
   }
 
