@@ -142,6 +142,11 @@ class ChatMessageServingHandler
                 ])
             );
 
+            // 채팅방에 사람이 없을 경우, 채팅방 없애기.
+            if ($chatRoom->getClientsCount() === 0) {
+                unset($this->chatRooms[$chatRoom->getUuid()]);
+            }
+
         }
 
         // 클라이언트 제거.
