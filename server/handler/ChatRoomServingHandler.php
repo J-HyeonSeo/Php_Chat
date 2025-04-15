@@ -14,15 +14,15 @@ class ChatRoomServingHandler {
   }
 
   // 커넥션이 연결되었다면, 채팅방 목록을 제공해주어야 함.
-  public function onOpen(ConnectionInterface $conn, array $chatRoomList) {
+  public function onOpen(ConnectionInterface $conn, array $chatRooms) {
     $this->clients->attach($conn);
-    $this->onMessage($chatRoomList);
+    $this->onMessage($chatRooms);
   }
 
   // 클라이언트에서 채팅방을 신규로 생성하면, 이벤트를 보낼거임. 연결된 clients들에게 변경사항 응답.
-  public function onMessage(array $chatRoomList) {
+  public function onMessage(array $chatRooms) {
     foreach ($this->clients as $client) {
-      $client->send(json_encode($chatRoomList));
+      $client->send(json_encode($chatRooms));
     }
   }
 
