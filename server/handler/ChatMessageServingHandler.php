@@ -21,6 +21,21 @@ class ChatMessageServingHandler
         $this->chatLimit = $chatLimit;
     }
 
+    // 채팅방 목록 반환하기.
+    public function getChatRoomsInfo(): array
+    {
+        $chatRoomsInfo = [];
+
+        foreach ($this->chatRooms as $chatRoom) {
+            array_push($chatRoomsInfo, [
+                'title' => $chatRoom->getTitle(),
+                'count' => $chatRoom->getClientsCount()
+            ]);
+        }
+
+        return $chatRoomsInfo;
+    }
+
     // 클라이언트 연결 처리.
     public function onOpen(ConnectionInterface $conn)
     {

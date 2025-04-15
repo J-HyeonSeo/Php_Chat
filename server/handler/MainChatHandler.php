@@ -27,7 +27,8 @@ class MainChatHandler implements MessageComponentInterface
 
         if ($path === '/chat/room') {
             // TODO => 채팅방목록 불러오는 코드 필요..!
-            $this->chatRoomServingHandler->onOpen($conn, []);
+            $chatRoomsInfo = $this->chatMessageServingHandler->getChatRoomsInfo();
+            $this->chatRoomServingHandler->onOpen($conn, $chatRoomsInfo);
         } else if ($path === '/chat/message') {
             $this->chatMessageServingHandler->onOpen($conn);
         } else {
@@ -83,6 +84,9 @@ class MainChatHandler implements MessageComponentInterface
 
                 $this->chatMessageServingHandler->createChatRoom($conn, $chatRoom, $user);
 
+                // 신규로 방을 생성했으므로, Room대기 화면에 있는 클라이언트에게 정보 전달.
+                $this->chatRoomServingHandler->onMessage($this->chatMessageServingHandler->getChatRoomsInfo());
+
                 break;
             case 'ENTER':   // 방입장하기
 
@@ -101,6 +105,9 @@ class MainChatHandler implements MessageComponentInterface
                 $user = new User($nickname);
 
                 $this->chatMessageServingHandler->enterChatRoom($conn, $user, $uuid);
+
+                // 인원에 대한 변동으로 방정보 내용 재전송.
+                $this->chatRoomServingHandler->onMessage($this->chatMessageServingHandler->getChatRoomsInfo());
 
                 break;
             case 'SEND_MESSAGE': // 메세지보내기
@@ -125,6 +132,9 @@ class MainChatHandler implements MessageComponentInterface
         // 채팅방 핸들러, 채팅메세지 핸들러의 클라이언트를 조사해서, 목록을 제거해야함.
         $this->chatRoomServingHandler->onClose($conn);
         $this->chatMessageServingHandler->onClose($conn);
+
+        // 인원에 대한 변동으로 방정보 내용 재전송.
+        $this->chatRoomServingHandler->onMessage($this->chatMessageServingHandler->getChatRoomsInfo());
     }
 
 
