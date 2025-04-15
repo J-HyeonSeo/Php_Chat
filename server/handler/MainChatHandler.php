@@ -28,9 +28,8 @@ class MainChatHandler implements MessageComponentInterface
         if ($path === '/chat/room') {
             // TODO => 채팅방목록 불러오는 코드 필요..!
             $this->chatRoomServingHandler->onOpen($conn, []);
-        } else if (preg_match('#/chat/message/([a-zA-Z0-9\-]{32})#', $path, $matches)) {
-            $uuid = $matches[1];
-            $this->chatMessageServingHandler->onOpen($conn, $uuid);
+        } else if ($path === '/chat/message') {
+            $this->chatMessageServingHandler->onOpen($conn);
         } else {
             // 매칭되는 라우팅이 없으므로, 커넥션 종료 처리.
             $conn->close();
@@ -44,17 +43,35 @@ class MainChatHandler implements MessageComponentInterface
 
         // 메세지를 보내는 요청이 아니라면, 조작된 요청이므로, 차단.
         if ($conn->httpRequest->getUri()->getPath() !== "/chat/message") {
-            return;
+            throw new \Exception("허용되지 않은 요청을 보냈습니다.");
         }
 
         // 데이터 추출.
         $jsonData = json_decode($msg->getPayload(), true);
 
+        // 타입 데이터 검증.
+        if (!array_key_exists('type', $jsonData)) {
+            throw new \Exception("메세지 유형을 입력해주세요.");
+        }
+
         // 타입 추출.
         $type = $jsonData['type'];
+        echo $type . PHP_EOL;
 
         switch ($type) {
             case 'CREATE': // 방만들기
+
+                if (!array_key_exists('uuid', $jsonData)) {
+                    throw new \Exception("채팅방 uuid를 입력해주세요.");
+                }
+
+                if (!array_key_exists('title', $jsonData)) {
+                    throw new \Exception("채팅방 제목을 입력해주세요.");
+                }
+
+                if (!array_key_exists('nickname', $jsonData)) {
+                    throw new \Exception("닉네임을 입력해주세요.");
+                }
 
                 // 요청시 필요한 JSON 데이터.
                 $uuid = $jsonData['uuid'];
@@ -67,7 +84,15 @@ class MainChatHandler implements MessageComponentInterface
                 $this->chatMessageServingHandler->createChatRoom($conn, $chatRoom, $user);
 
                 break;
-            case 'JOIN':   // 방입장하기
+            case 'ENTER':   // 방입장하기
+
+                if (!array_key_exists('uuid', $jsonData)) {
+                    throw new \Exception("채팅방 uuid를 입력해주세요.");
+                }
+
+                if (!array_key_exists('nickname', $jsonData)) {
+                    throw new \Exception("닉네임을 입력해주세요.");
+                }
 
                 // 요청시 필요한 JSON 데이터.
                 $uuid = $jsonData['uuid'];
@@ -79,6 +104,10 @@ class MainChatHandler implements MessageComponentInterface
 
                 break;
             case 'SEND_MESSAGE': // 메세지보내기
+
+                if (!array_key_exists('message', $jsonData)) {
+                    throw new \Exception("메세지를 입력해주세요.");
+                }
 
                 // 요청시 필요한 JSON 데이터.
                 $message = $jsonData['message'];
@@ -103,6 +132,13 @@ class MainChatHandler implements MessageComponentInterface
     function onError(ConnectionInterface $conn, \Exception $e)
     {
         echo "서버에 오류가 발생하였습니다. : {$e->getMessage()}\n";
+
+        $conn->send(
+            json_encode([
+                'type' => 'error',
+                'error_message' => $e->getMessage()
+            ])
+        );
     }
 }
 

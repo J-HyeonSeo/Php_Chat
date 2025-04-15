@@ -25,6 +25,7 @@ class ChatMessageServingHandler
     public function onOpen(ConnectionInterface $conn)
     {
         $this->clients->attach($conn);
+        $this->clients[$conn] = [];
     }
 
     // 채팅방 생성
@@ -36,6 +37,7 @@ class ChatMessageServingHandler
         }
 
         // 현재 커넥션의 유저에게 채팅방을 할당함.
+        $chatRoom->addClient($conn, $user);
         $this->clients[$conn] = [
             'chatRoom' => $chatRoom,
             'user' => $user
@@ -55,7 +57,7 @@ class ChatMessageServingHandler
         $chatRoom = $this->chatRooms[$chatRoomUuid];
 
         // 인원수 초과 (정원 4명)
-        if ($chatRoom->getClients()->count() >= $this->chatLimit) {
+        if ($chatRoom->getClientsCount() >= $this->chatLimit) {
             throw new \Exception("정원이 초과된 채팅방입니다.");
         }
 
@@ -68,11 +70,12 @@ class ChatMessageServingHandler
 
         // 채팅방 닉네임 정보 전달.
         $nicknames = $chatRoom->getNicknames();
-        foreach ($chatRoom->getClients() as $client) {
-            $client->send(json_encode([
+        $chatRoom->sendWithMe(
+            json_encode([
+                'type' => 'nickname',
                 'nicknames' => $nicknames
-            ]));
-        }
+            ])
+        );
 
     }
 
@@ -80,7 +83,7 @@ class ChatMessageServingHandler
     public function sendChatMessage(ConnectionInterface $conn, $message) {
 
         // 소속된 채팅방이 있는가?
-        if (array_key_exists('chatRoom', $this->clients[$conn])) {
+        if (!array_key_exists('chatRoom', $this->clients[$conn])) {
             throw new \Exception("채팅방에 입장하지 않은 클라이언트 입니다.");
         }
 
@@ -89,22 +92,38 @@ class ChatMessageServingHandler
         $chatRoom = $this->clients[$conn]['chatRoom'];
 
         $messageWithRoomInfo = [
+            'type' => 'message',
             'message' => $message,
-            'from' => $user->nickname
+            'from' => $user->getNickname()
         ];
 
         // 메세지 보내기.
-        $chatRoom->send($conn, $messageWithRoomInfo);
+        $chatRoom->sendWithoutMe($conn,
+            json_encode($messageWithRoomInfo));
     }
 
     // 채팅방을 나갔을 때.
     public function onClose(ConnectionInterface $conn)
     {
-        // 클라이언트가 속한 채팅방 가져오기.
-        $chatRoom = $this->clients[$conn]['chatRoom'];
+        // 채팅방이 있었다면..
+        if (array_key_exists('chatRoom', $this->clients[$conn])) {
 
-        // 채팅방에서 클라이언트 제거.
-        $chatRoom->removeClient($conn);
+            // 클라이언트가 속한 채팅방 가져오기.
+            $chatRoom = $this->clients[$conn]['chatRoom'];
+
+            // 채팅방에서 클라이언트 제거.
+            $chatRoom->removeClient($conn);
+
+            // 채팅방에 닉네임 알려주기.
+            $chatRoom->sendWithoutMe(
+                $conn,
+                json_encode([
+                    'type' => 'nickname',
+                    'message' => $chatRoom->getNicknames()
+                ])
+            );
+
+        }
 
         // 클라이언트 제거.
         $this->clients->detach($conn);
