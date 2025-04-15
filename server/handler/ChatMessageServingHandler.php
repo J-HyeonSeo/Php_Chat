@@ -51,6 +51,8 @@ class ChatMessageServingHandler
             throw new \Exception("이미 존재하는 채팅방입니다.");
         }
 
+        // TODO => 이미 user에 할당된 채팅방이 있다면, 오류처리 (API 조작임.)
+
         // 현재 커넥션의 유저에게 채팅방을 할당함.
         $chatRoom->addClient($conn, $user);
         $this->clients[$conn] = [
@@ -68,6 +70,8 @@ class ChatMessageServingHandler
         if (!array_key_exists($chatRoomUuid, $this->chatRooms)) {
             throw new \Exception("존재하지 않는 채팅방입니다.");
         }
+
+        // TODO => 이미 입장하고 있는 채팅방이 있다면, 오류처리 (API 조작임.)
 
         $chatRoom = $this->chatRooms[$chatRoomUuid];
 
