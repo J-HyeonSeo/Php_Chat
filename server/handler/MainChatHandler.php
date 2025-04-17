@@ -26,7 +26,6 @@ class MainChatHandler implements MessageComponentInterface
         $path = $conn->httpRequest->getUri()->getPath();
 
         if ($path === '/chat/room') {
-            // TODO => 채팅방목록 불러오는 코드 필요..!
             $chatRoomsInfo = $this->chatMessageServingHandler->getChatRoomsInfo();
             $this->chatRoomServingHandler->onOpen($conn, $chatRoomsInfo);
         } else if ($path === '/chat/message') {
