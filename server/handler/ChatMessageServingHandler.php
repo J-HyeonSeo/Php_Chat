@@ -98,7 +98,7 @@ class ChatMessageServingHandler
         $nicknames = $chatRoom->getNicknames();
         $chatRoom->sendWithMe(
             json_encode([
-                'type' => 'nickname',
+                'type' => 'NICKNAME',
                 'nicknames' => $nicknames
             ], JSON_UNESCAPED_UNICODE)
         );
@@ -119,7 +119,7 @@ class ChatMessageServingHandler
         $chatRoom = $this->clients[$conn]['chatRoom'];
 
         $messageWithRoomInfo = [
-            'type' => 'message',
+            'type' => 'MESSAGE',
             'message' => $message,
             'from' => $user->getNickname()
         ];
@@ -147,7 +147,7 @@ class ChatMessageServingHandler
             $chatRoom->sendWithoutMe(
                 $conn,
                 json_encode([
-                    'type' => 'nickname',
+                    'type' => 'NICKNAME',
                     'message' => $chatRoom->getNicknames()
                 ], JSON_UNESCAPED_UNICODE)
             );

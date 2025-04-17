@@ -145,7 +145,7 @@ class MainChatHandler implements MessageComponentInterface
 
         $conn->send(
             json_encode([
-                'type' => 'error',
+                'type' => 'ERROR',
                 'error_message' => $e->getMessage()
             ], JSON_UNESCAPED_UNICODE)
         );
