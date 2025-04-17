@@ -21,7 +21,7 @@
             </div>
             <div id="chat-input-wrap">
                 <textarea id="chat-input" placeholder="채팅을 입력해주세요.."></textarea>
-                <img id="chat-send-btn" src="assets/images/send-chat-btn.png">
+                <img id="chat-send-btn" onclick="sendMessage()" src="assets/images/send-chat-btn.png">
             </div>
         </div>
 
@@ -43,12 +43,17 @@
         const mode = '<?= htmlspecialchars($mode, ENT_QUOTES, 'UTF-8') ?>';
         const nickname = '<?= htmlspecialchars($_POST['nickname'], ENT_QUOTES, 'UTF-8') ?>';
 
+        // DOM 객체
+        const participantContentEle = $('#participant-content');
+        const chatContentEle = $('#chat-content');
+        const chatInput = $('#chat-input');
+
         // 웹소켓이 연결되면, 최초 실행.
         socket.onopen = function() {
 
             if (mode === 'CREATE') { // 채팅방 신규 생성
                 const uuid = crypto.randomUUID();
-                const title = '<?= htmlspecialchars($_POST['title'], ENT_QUOTES, 'UTF-8') ?>';
+                const title = '<?= htmlspecialchars($_POST['title'] ?? '', ENT_QUOTES, 'UTF-8') ?>';
 
                 socket.send(
                     JSON.stringify({
@@ -83,6 +88,7 @@
 
             switch (type) {
                 case 'NICKNAME':
+                    console.log(data);
                     // TODO => 닉네임 리스트 갱신.
                     break;
                 case 'MESSAGE':
@@ -94,6 +100,24 @@
             }
 
         }
+
+        // 메세지 전송 관련 함수 및 이벤트
+        function sendMessage() {
+            const chatText = chatInput.val();
+            alert(chatText);
+        }
+
+        chatInput.on('keydown', function(event) {
+            if (chatInput.val().trim() === '') {
+                event.preventDefault();
+                return;
+            }
+            if (event.key === 'Enter' && !event.shiftKey) {
+                event.preventDefault();
+                sendMessage();
+                chatInput.val('');
+            }
+        });
 
 
     </script>
