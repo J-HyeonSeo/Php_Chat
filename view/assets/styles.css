@@ -139,6 +139,10 @@ header h1 {
     border: none;
 }
 
+.modal-btn-wrap {
+    text-align: center;
+}
+
 .modal-btn {
     width: 150px;
     height: 40px;
@@ -149,6 +153,7 @@ header h1 {
     text-align: center;
     line-height: 40px;
     margin: 15px auto;
+    border: none;
 }
 
 .modal-btn:hover {
