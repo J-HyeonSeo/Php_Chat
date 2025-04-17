@@ -32,3 +32,17 @@ docker run -d --name phpchat -p 7777:80 -p 7778:7778 phpchat
 ```
 http://localhost:7777
 ```
+
+# 시연
+
+- 메인화면
+![main](/doc/main.png)
+
+- 채팅방 만들기
+![create](/doc/create.png)
+
+- 방 입장하기
+![enter](/doc/enter.png)
+
+- 채팅창
+![chat](/doc/chat.png)
