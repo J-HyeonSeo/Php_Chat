@@ -66,6 +66,16 @@ class ChatMessageServingHandler
         ];
 
         $this->chatRooms[$chatRoom->getUuid()] = $chatRoom;
+
+        // 채팅방 닉네임 정보 전달.
+        $nicknames = $chatRoom->getNicknames();
+        $chatRoom->sendWithMe(
+            json_encode([
+                'type' => 'NICKNAME',
+                'nicknames' => $nicknames
+            ], JSON_UNESCAPED_UNICODE)
+        );
+
     }
 
     // 채팅방 입장
@@ -149,7 +159,7 @@ class ChatMessageServingHandler
                 $conn,
                 json_encode([
                     'type' => 'NICKNAME',
-                    'message' => $chatRoom->getNicknames()
+                    'nicknames' => $chatRoom->getNicknames()
                 ], JSON_UNESCAPED_UNICODE)
             );
 
