@@ -28,6 +28,7 @@ class ChatMessageServingHandler
 
         foreach ($this->chatRooms as $chatRoom) {
             array_push($chatRoomsInfo, [
+                'uuid' => $chatRoom->getUuid(),
                 'title' => $chatRoom->getTitle(),
                 'count' => $chatRoom->getClientsCount()
             ]);
