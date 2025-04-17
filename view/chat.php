@@ -1,4 +1,11 @@
 <?php include 'templates/header.php';
+
+    // GET요청은 허용하지 않음.
+    if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+        header("Location: /");
+        exit;
+    }
+
     $mode = 'CREATE';
     if (isset($_POST['uuid'])) {
         $mode = 'ENTER';
@@ -7,18 +14,7 @@
 
     <section id="chat-section">
         <div id="chat-wrap">
-            <div id="chat-content">
-                <div class="chat-card-wrap">
-                    <h4 class="chat-nickname me">ME</h4>
-                    <div class="chat-card me">루비짱</div>
-                </div>
-
-                <div class="chat-card-wrap">
-                    <h4 class="chat-nickname other">루비</h4>
-                    <div class="chat-card other">하이~</div>
-                </div>
-
-            </div>
+            <div id="chat-content"></div>
             <div id="chat-input-wrap">
                 <textarea id="chat-input" placeholder="채팅을 입력해주세요.."></textarea>
                 <img id="chat-send-btn" onclick="sendMessage()" src="assets/images/send-chat-btn.png">
@@ -29,10 +25,7 @@
             <div id="participant-title">
                 참가자 목록
             </div>
-            <div id="participant-content">
-                <div class="participant-card me">MR</div>
-                <div class="participant-card other">루비</div>
-            </div>
+            <div id="participant-content"></div>
         </div>
     </section>
     <div id="chat-exit-btn" onclick="window.location.href = '/'">나가기</div>
@@ -88,11 +81,37 @@
 
             switch (type) {
                 case 'NICKNAME':
-                    console.log(data);
-                    // TODO => 닉네임 리스트 갱신.
+                    participantContentEle.empty();
+
+                    const nicknames = data.nicknames;
+
+                    // 본인 닉네임 제거
+                    const index = nicknames.indexOf(nickname);
+                    if (index !== -1) {
+                        nicknames.splice(index, 1);
+                    }
+
+                    const participantCardEle = $('<div>').addClass('participant-card me').text(nickname);
+                    participantContentEle.append(participantCardEle);
+
+                    // 다른 사람 닉네임 순회
+                    for (const otherNickname of nicknames) {
+                        const participantCardEle = $('<div>').addClass('participant-card other').text(otherNickname);
+                        participantContentEle.append(participantCardEle);
+                    }
+
                     break;
                 case 'MESSAGE':
-                    // TODO => 메세지 DOM 추가.
+                    const chatCardWrap = $('<div>').addClass('chat-card-wrap');
+                    const nicknameEle = $('<h4>').addClass('chat-nickname other').text(data.from);
+                    const chatCardEle = $('<div>').addClass('chat-card other').text(data.message);
+
+                    chatCardWrap.append(nicknameEle, chatCardEle);
+                    chatContentEle.append(chatCardWrap);
+
+                    // 하단 이동
+                    chatContentEle.scrollTop(chatContentEle[0].scrollHeight);
+
                     break;
                 case 'ERROR':
                     alert(data['error_message']);
@@ -104,7 +123,25 @@
         // 메세지 전송 관련 함수 및 이벤트
         function sendMessage() {
             const chatText = chatInput.val();
-            alert(chatText);
+
+            const chatCardWrap = $('<div>').addClass('chat-card-wrap');
+            const nicknameEle = $('<h4>').addClass('chat-nickname me').text(nickname);
+            const chatCardEle = $('<div>').addClass('chat-card me').text(chatText);
+
+            chatCardWrap.append(nicknameEle, chatCardEle);
+            chatContentEle.append(chatCardWrap);
+
+            socket.send(
+                JSON.stringify(
+                    {
+                        'type': "SEND_MESSAGE",
+                        'message': chatText
+                    }
+                )
+            );
+
+            // 하단 이동
+            chatContentEle.scrollTop(chatContentEle[0].scrollHeight);
         }
 
         chatInput.on('keydown', function(event) {
