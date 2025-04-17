@@ -44,14 +44,18 @@ class ChatMessageServingHandler
     }
 
     // 채팅방 생성
-    public function createChatRoom(ConnectionInterface $conn, ChatRoom $chatRoom, User $user) {
+    public function createChatRoom(ConnectionInterface $conn, ChatRoom $chatRoom, User $user)
+    {
 
         // 이미 같은 uuid를 통한 채팅방이 있으면, 오류 발생 (API 조작의 경우.)
         if (array_key_exists($chatRoom->getUuid(), $this->chatRooms)) {
             throw new \Exception("이미 존재하는 채팅방입니다.");
         }
 
-        // TODO => 이미 user에 할당된 채팅방이 있다면, 오류처리 (API 조작임.)
+        // 이미 user에 할당된 채팅방이 있다면, 오류처리 (API 조작임.)
+        if (array_key_exists('chatRoom', $this->clients[$conn])) {
+            throw new \Exception("이미 다른 채팅방에 입장한 유저입니다.");
+        }
 
         // 현재 커넥션의 유저에게 채팅방을 할당함.
         $chatRoom->addClient($conn, $user);
@@ -71,7 +75,10 @@ class ChatMessageServingHandler
             throw new \Exception("존재하지 않는 채팅방입니다.");
         }
 
-        // TODO => 이미 입장하고 있는 채팅방이 있다면, 오류처리 (API 조작임.)
+        // 이미 입장하고 있는 채팅방이 있다면, 오류처리 (API 조작임.)
+        if (array_key_exists('chatRoom', $this->clients[$conn])) {
+            throw new \Exception("이미 다른 채팅방에 입장한 유저입니다.");
+        }
 
         $chatRoom = $this->chatRooms[$chatRoomUuid];
 
@@ -99,7 +106,8 @@ class ChatMessageServingHandler
     }
 
     // 채팅방에 메세지 보내기
-    public function sendChatMessage(ConnectionInterface $conn, $message) {
+    public function sendChatMessage(ConnectionInterface $conn, $message)
+    {
 
         // 소속된 채팅방이 있는가?
         if (!array_key_exists('chatRoom', $this->clients[$conn])) {
