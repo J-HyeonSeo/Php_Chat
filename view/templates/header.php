@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="assets/styles.css">
     <script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js"></script>
     <script>
-        const WEB_SOCKET_SERVER = "ws://localhost:7778";
+        const WEB_SOCKET_SERVER = `ws://${location.hostname}:7778`;
     </script>
 </head>
 <body>
