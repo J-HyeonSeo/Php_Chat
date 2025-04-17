@@ -124,6 +124,10 @@
         function sendMessage() {
             const chatText = chatInput.val();
 
+            if (chatText === '') {
+                return;
+            }
+
             const chatCardWrap = $('<div>').addClass('chat-card-wrap');
             const nicknameEle = $('<h4>').addClass('chat-nickname me').text(nickname);
             const chatCardEle = $('<div>').addClass('chat-card me').text(chatText);
@@ -142,17 +146,15 @@
 
             // 하단 이동
             chatContentEle.scrollTop(chatContentEle[0].scrollHeight);
+
+            // 내용 비우기
+            chatInput.val('');
         }
 
         chatInput.on('keydown', function(event) {
-            if (chatInput.val().trim() === '') {
-                event.preventDefault();
-                return;
-            }
             if (event.key === 'Enter' && !event.shiftKey) {
                 event.preventDefault();
                 sendMessage();
-                chatInput.val('');
             }
         });
 
