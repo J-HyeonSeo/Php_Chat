@@ -69,14 +69,19 @@
 
         for (chatRoom of chatRooms) {
 
-            const chatCardHtml = `
-                <div class="chat-room-card" onclick="openEnterModal(event)" data-uuid="${chatRoom.uuid}">
-                  <h3 class="chat-title">${chatRoom.title}</h3>
-                  <h3 class="chat-count">${chatRoom.count} / 4</h3>
-                </div>
-              `;
+            const chatRoomCardEle = $('<div>').addClass('chat-room-card')
+                .attr('data-uuid', chatRoom.uuid)
+                .on('click', openEnterModal);
 
-            chatRoomWrapEle.append(chatCardHtml);
+            const chatTitleEle = $('<h3>').addClass('chat-title')
+                .text(chatRoom.title);
+
+            const chatCountEle = $('<h3>').addClass('chat-count')
+                .text(`${chatRoom.count} / 4`);
+
+            chatRoomCardEle.append(chatTitleEle, chatCountEle);
+
+            chatRoomWrapEle.append(chatRoomCardEle);
         }
 
     }
