@@ -2,7 +2,7 @@
 
   <div id="back-drop"></div>
 
-  <!-- 신규 채팅방 생성 모달달 -->
+  <!-- 신규 채팅방 생성 모달 -->
   <div class="modal" id="new-chat-modal">
     <h3 class="modal-title">새 채팅</h3>
     <div class="modal-input-wrap">
@@ -41,38 +41,37 @@
       <h3 class="chat-title">심심해요... PHP로 대화할래요?</h3>
       <h3 class="chat-count">1 / 4</h3>
     </div>
-    <div class="chat-room-card">
-      <h3 class="chat-title">심심해요... PHP로 대화할래요?</h3>
-      <h3 class="chat-count">1 / 4</h3>
-    </div>
-    <div class="chat-room-card">
-      <h3 class="chat-title">심심해요... PHP로 대화할래요?</h3>
-      <h3 class="chat-count">1 / 4</h3>
-    </div>
-    <div class="chat-room-card">
-      <h3 class="chat-title">심심해요... PHP로 대화할래요?</h3>
-      <h3 class="chat-count">1 / 4</h3>
-    </div>
-    <div class="chat-room-card">
-      <h3 class="chat-title">심심해요... PHP로 대화할래요?</h3>
-      <h3 class="chat-count">1 / 4</h3>
-    </div>
-    <div class="chat-room-card">
-      <h3 class="chat-title">심심해요... PHP로 대화할래요?</h3>
-      <h3 class="chat-count">1 / 4</h3>
-    </div>
-    <div class="chat-room-card">
-      <h3 class="chat-title">심심해요... PHP로 대화할래요?</h3>
-      <h3 class="chat-count">1 / 4</h3>
-    </div>
-    <div class="chat-room-card">
-      <h3 class="chat-title">심심해요... PHP로 대화할래요?</h3>
-      <h3 class="chat-count">1 / 4</h3>
-    </div>
   </div>
 
-  <sciprt>
-    <!-- const socket = new WebSocket(); -->
-  </sciprt>
+  <script>
+
+      // 채팅방 목록을 가져오기 위한 웹소켓 서버 연결.
+     const socket = new WebSocket(WEB_SOCKET_SERVER + "/chat/room");
+     const chatRoomWrapEle = $('#chat-room-wrap');
+
+     // 채팅방 목록을 전달받았을 경우.
+     socket.onmessage = function(event) {
+         const chatRooms = JSON.parse(event.data).chatRooms;
+
+         // 채팅방 목록 비우기
+         chatRoomWrapEle.empty();
+
+         for (chatRoom of chatRooms) {
+
+             const chatCardHtml = `
+                <div class="chat-room-card" data-uuid="${chatRoom.uuid}">
+                  <h3 class="chat-title">${chatRoom.title}</h3>
+                  <h3 class="chat-count">${chatRoom.count} / 4</h3>
+                </div>
+              `;
+
+             chatRoomWrapEle.append(chatCardHtml);
+
+             console.log(chatRoom);
+         }
+
+     }
+
+  </script>
 
 <?php include 'templates/footer.php'; ?>
