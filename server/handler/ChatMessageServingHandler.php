@@ -100,7 +100,7 @@ class ChatMessageServingHandler
             json_encode([
                 'type' => 'nickname',
                 'nicknames' => $nicknames
-            ])
+            ], JSON_UNESCAPED_UNICODE)
         );
 
     }
@@ -126,7 +126,9 @@ class ChatMessageServingHandler
 
         // 메세지 보내기.
         $chatRoom->sendWithoutMe($conn,
-            json_encode($messageWithRoomInfo));
+            json_encode($messageWithRoomInfo),
+            JSON_UNESCAPED_UNICODE
+        );
     }
 
     // 채팅방을 나갔을 때.
@@ -147,7 +149,7 @@ class ChatMessageServingHandler
                 json_encode([
                     'type' => 'nickname',
                     'message' => $chatRoom->getNicknames()
-                ])
+                ], JSON_UNESCAPED_UNICODE)
             );
 
             // 채팅방에 사람이 없을 경우, 채팅방 없애기.

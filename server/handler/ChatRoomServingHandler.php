@@ -22,7 +22,10 @@ class ChatRoomServingHandler {
   // 클라이언트에서 채팅방을 신규로 생성하면, 이벤트를 보낼거임. 연결된 clients들에게 변경사항 응답.
   public function onMessage(array $chatRooms) {
     foreach ($this->clients as $client) {
-      $client->send(json_encode($chatRooms));
+      $client->send(json_encode([
+          'type' => 'CHATROOM',
+          "chatRooms" => $chatRooms
+      ], JSON_UNESCAPED_UNICODE));
     }
   }
 
