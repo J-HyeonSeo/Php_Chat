@@ -10,11 +10,11 @@
             <span class="modal-close-btn" onclick="closeModal()">X</span>
             <label for="chat-room-title">채팅방 제목</label>
             <br>
-            <input id="chat-room-title" required minlength="2" maxlength="20" placeholder="제목을 입력해주세요...">
+            <input name="title" id="chat-room-title" required minlength="2" maxlength="20" placeholder="제목을 입력해주세요...">
             <br>
             <label for="nickname">닉네임</label>
             <br>
-            <input id="nickname" required minlength="2" maxlength=7" placeholder="닉네임을 입력해주세요...">
+            <input name="nickname" id="nickname" required minlength="2" maxlength=7" placeholder="닉네임을 입력해주세요...">
         </div>
         <div class="modal-btn-wrap">
             <button id="create-chat-room-btn" class="modal-btn">완료</button>
@@ -27,10 +27,11 @@
     <h3 class="modal-title">방 입장</h3>
     <form action="chat.php" method="POST">
         <div class="modal-input-wrap">
+            <input hidden="hidden" name="uuid" id="uuid-input">
             <span class="modal-close-btn" onclick="closeModal()">X</span>
             <label for="nickname">닉네임</label>
             <br>
-            <input id="nickname" required minlength="2" maxlength=7" placeholder="닉네임을 입력해주세요...">
+            <input name="nickname" id="nickname" required minlength="2" maxlength=7" placeholder="닉네임을 입력해주세요...">
         </div>
         <div class="modal-btn-wrap">
             <button id="create-chat-room-btn" class="modal-btn">완료</button>
@@ -56,6 +57,8 @@
     const backDropEle = $('#back-drop');
     const newChatModalEle = $('#new-chat-modal');
     const chatEnterModalEle = $('#chat-enter-modal');
+    const uuidInputEle = $('#uuid-input');
+
 
     // 채팅방 목록을 전달받았을 경우.
     socket.onmessage = function (event) {
@@ -67,7 +70,7 @@
         for (chatRoom of chatRooms) {
 
             const chatCardHtml = `
-                <div class="chat-room-card" onclick="openEnterModal()" data-uuid="${chatRoom.uuid}">
+                <div class="chat-room-card" onclick="openEnterModal(event)" data-uuid="${chatRoom.uuid}">
                   <h3 class="chat-title">${chatRoom.title}</h3>
                   <h3 class="chat-count">${chatRoom.count} / 4</h3>
                 </div>
@@ -84,7 +87,11 @@
         newChatModalEle.show();
     }
 
-    function openEnterModal() {
+    function openEnterModal(event) {
+
+        // input에 uuid 할당하기.
+        uuidInputEle.val(event.target.dataset.uuid);
+
         backDropEle.show();
         chatEnterModalEle.show();
     }
